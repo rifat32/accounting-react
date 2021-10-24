@@ -2,20 +2,18 @@ import React, { useState, useEffect } from "react";
 import { BACKENDAPI } from "../../../data/config";
 import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
-import { UpdateFormInterface } from "../../../interfaces/UpdateFormInterfaced";
 
-interface FormData {
-	id: string;
-	name: string;
-}
-const AddWingForm: React.FC<UpdateFormInterface> = (props) => {
-	const [formData, setFormData] = useState<FormData>({
-		id: "",
+const EditWingForm: React.FC<{ value: any; loadWings: any; showModal: any }> = (
+	props
+) => {
+	const [formData, setFormData] = useState({
 		name: "",
+		id: "",
 	});
-
 	const [errors, setErrors] = useState<any>(null);
-
+	useEffect(() => {
+		setFormData(props.value);
+	}, []);
 	// handle Change Function
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,59 +25,17 @@ const AddWingForm: React.FC<UpdateFormInterface> = (props) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
-	const resetFunction = () => {
-		setFormData({
-			id: "",
-			name: "",
-		});
-	};
 	// handle submit Function
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		console.log(formData);
 		setErrors(null);
-		if (props.type === "update") {
-			updateWing();
-		} else {
-			createWing();
-		}
-	};
-	const createWing = () => {
-		apiClient()
-			.post(`${BACKENDAPI}/v1.0/wings`, { ...formData })
-			.then((response) => {
-				console.log(response);
-				toast.success("Wing saved");
-				resetFunction();
-			})
-			.catch((error) => {
-				console.log(error.response);
-				if (
-					error.response.status === 404 ||
-					error.response.status === 400
-				) {
-					toast.error(error.response.data.message);
-				}
-				if (error.response.status === 422) {
-					toast.error("invalid input");
-					setErrors(error.response.data.errors);
-				}
-			});
-	};
-	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-	// edit data section
-	useEffect(() => {
-		if (props.type == "update") {
-			setFormData(props.value);
-		}
-	}, []);
-	const updateWing = () => {
 		apiClient()
 			.put(`${BACKENDAPI}/v1.0/wings`, { ...formData })
-			.then((response: any) => {
+			.then((response) => {
 				console.log(response);
 				toast.success("Wing Updated");
-				props.updateDataStates(response.data.wing);
+				props.loadWings();
 				props.showModal(false);
 			})
 			.catch((error) => {
@@ -96,8 +52,6 @@ const AddWingForm: React.FC<UpdateFormInterface> = (props) => {
 				}
 			});
 	};
-	// end edit Data section
-	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 	return (
 		<form className="row g-3" onSubmit={handleSubmit}>
@@ -129,15 +83,9 @@ const AddWingForm: React.FC<UpdateFormInterface> = (props) => {
 				<button type="submit" className="btn btn-primary me-2">
 					Submit
 				</button>
-				<button
-					type="button"
-					onClick={resetFunction}
-					className="btn btn-secondary">
-					Reset
-				</button>
 			</div>
 		</form>
 	);
 };
 
-export default AddWingForm;
+export default EditWingForm;

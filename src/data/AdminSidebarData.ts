@@ -76,7 +76,7 @@ export const adminSideBarData: NavInterface[] = [
 		name: "Requisition",
 		list: [
 			{
-				name: "Requisitions Create",
+				name: "Create Requisition",
 				link: "/admin/requisitions/create",
 				permissions: ["create requisition"],
 			},

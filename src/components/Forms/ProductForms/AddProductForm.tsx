@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BACKENDAPI } from "../../../data/config";
 import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
+import { UpdateFormInterface } from "../../../interfaces/UpdateFormInterfaced";
 
 interface FormData {
 	name: string;
@@ -17,7 +18,7 @@ interface FormData {
 	price: string;
 	wing_id: string;
 }
-const AddProductForm: React.FC = () => {
+const AddProductForm: React.FC<UpdateFormInterface> = (props) => {
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
 		brand: "",
@@ -75,6 +76,13 @@ const AddProductForm: React.FC = () => {
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		setErrors(null);
+		if (props.type === "update") {
+			updateProduct();
+		} else {
+			createProduct();
+		}
+	};
+	const createProduct = () => {
 		apiClient()
 			.post(`${BACKENDAPI}/v1.0/products`, { ...formData })
 			.then((response) => {
@@ -96,6 +104,40 @@ const AddProductForm: React.FC = () => {
 				}
 			});
 	};
+	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	// edit data section
+	useEffect(() => {
+		if (props.type == "update") {
+			setFormData(props.value);
+		}
+	}, []);
+	const updateProduct = () => {
+		apiClient()
+			.put(`${BACKENDAPI}/v1.0/products`, { ...formData })
+			.then((response: any) => {
+				console.log(response);
+				toast.success("Product Updated");
+
+				props.updateDataStates(response.data.product);
+				props.showModal(false);
+			})
+			.catch((error) => {
+				console.log(error);
+				console.log(error.response);
+				if (
+					error.response.status === 404 ||
+					error.response.status === 400
+				) {
+					toast.error(error.response.data.message);
+				}
+				if (error.response.status === 422) {
+					toast.error("invalid input");
+					setErrors(error.response.data.errors);
+				}
+			});
+	};
+	// end edit Data section
+	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 	return (
 		<form className="row g-3" onSubmit={handleSubmit}>

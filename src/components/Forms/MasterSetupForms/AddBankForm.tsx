@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { BACKENDAPI } from "../../../data/config";
 import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
+import { UpdateFormInterface } from "../../../interfaces/UpdateFormInterfaced";
 
 interface FormData {
 	name: string;
 	account_number: string;
 	wing_id: string;
 }
-const AddBankForm: React.FC = () => {
+const AddBankForm: React.FC<UpdateFormInterface> = (props) => {
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
 		account_number: "",
@@ -56,6 +57,13 @@ const AddBankForm: React.FC = () => {
 		e.preventDefault();
 		console.log(formData);
 		setErrors(null);
+		if (props.type === "update") {
+			updateBank();
+		} else {
+			createBank();
+		}
+	};
+	const createBank = () => {
 		apiClient()
 			.post(`${BACKENDAPI}/v1.0/banks`, { ...formData })
 			.then((response) => {
@@ -77,6 +85,40 @@ const AddBankForm: React.FC = () => {
 				}
 			});
 	};
+	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	// edit data section
+	useEffect(() => {
+		if (props.type == "update") {
+			setFormData(props.value);
+		}
+	}, []);
+	const updateBank = () => {
+		apiClient()
+			.put(`${BACKENDAPI}/v1.0/banks`, { ...formData })
+			.then((response: any) => {
+				console.log(response);
+				toast.success("Bank Updated");
+
+				props.updateDataStates(response.data.bank);
+				props.showModal(false);
+			})
+			.catch((error) => {
+				console.log(error);
+				console.log(error.response);
+				if (
+					error.response.status === 404 ||
+					error.response.status === 400
+				) {
+					toast.error(error.response.data.message);
+				}
+				if (error.response.status === 422) {
+					toast.error("invalid input");
+					setErrors(error.response.data.errors);
+				}
+			});
+	};
+	// end edit Data section
+	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 	return (
 		<form className="row g-3">

@@ -59,7 +59,6 @@ const AddRoleForm: React.FC = () => {
 					el.permissions = el.permissions.map((el2: any) => {
 						if (el2.id === parseInt(pArray[2])) {
 							el2.checked = e.target.checked;
-							console.log(e.target.checked, "hhhh");
 							return el2;
 						}
 						return el2;
@@ -94,14 +93,26 @@ const AddRoleForm: React.FC = () => {
 		setFormData({
 			name: "",
 		});
+		loadRoles();
 	};
 	// handle submit Function
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		console.log(formData);
 		setErrors(null);
+		const permissions: any = [];
+		roles.map((el: any) => {
+			el.permissions.map((el2: any) => {
+				if (el2.checked) {
+					permissions.push(el2);
+				}
+			});
+		});
 		apiClient()
-			.post(`${BACKENDAPI}/v1.0/roles`, { ...formData })
+			.post(`${BACKENDAPI}/v1.0/roles`, {
+				...formData,
+				permissions,
+			})
 			.then((response) => {
 				console.log(response);
 				toast.success("Role saved");
@@ -149,6 +160,11 @@ const AddRoleForm: React.FC = () => {
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
 			<p>Permissions:</p>
+			{errors?.permissions && (
+				<div className="invalid-feedback" style={{ display: "block" }}>
+					{errors.permissions[0]}
+				</div>
+			)}
 			<div className="row">
 				<div className="col-10">
 					{roles.length &&

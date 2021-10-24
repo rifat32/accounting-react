@@ -16,3 +16,9 @@
 .d_btn {
 	border-bottom: 0.1rem solid black;
 }
+.card {
+	padding-bottom: 15rem;
+}
+.action {
+	background: #e6e0d1;
+}
