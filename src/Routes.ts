@@ -1,36 +1,39 @@
-import HomePage from "../pages/HomePage/index";
-import LoginPage from "../pages/LoginPage/index";
-import RegisterPage from "../pages/RegisterPage/index";
-import Admin from "../pages/AdminPages/DemoAdmin";
-import AddProductPage from "../pages/AdminPages/Product/AddProductPage";
-import ListProductPage from "../pages/AdminPages/Product/ListProductPage";
-import BrandPage from "../pages/AdminPages/Product/Brand/BrandPage";
-import { RouteInterface } from "../interfaces/RoutesInterface";
+import HomePage from "./pages/HomePage/index";
+import LoginPage from "./pages/LoginPage/index";
+import RegisterPage from "./pages/RegisterPage/index";
+import Admin from "./pages/AdminPages/DemoAdmin";
+import AddProductPage from "./pages/AdminPages/Product/AddProductPage";
+import ListProductPage from "./pages/AdminPages/Product/ListProductPage";
+import BrandPage from "./pages/AdminPages/Product/Brand/BrandPage";
+import { RouteInterface } from "./interfaces/RoutesInterface";
 
-import AddRequisition from "../pages/AdminPages/Requisition/AddRequisitionPage";
-import RequisitionsPage from "../pages/AdminPages/Requisition/RequisitionsPage";
-import AddParchasePage from "../pages/AdminPages/Parchase/AddParchasePage";
-import ListParchasePage from "../pages/AdminPages/Parchase/ListParchase";
-import AddRevenuePage from "../pages/AdminPages/Income/AddRevenuePage";
-import ListRevenuePage from "../pages/AdminPages/Income/ListRevenuePage";
-import AddCreditNotePage from "../pages/AdminPages/Income/AddCreditNotePage";
-import ListCreditNotesPage from "../pages/AdminPages/Income/ListCreditNotesPage";
-import CreateBillPage from "../pages/AdminPages/Expense/AddBillPage";
-import ListBillsPage from "../pages/AdminPages/Expense/ListBillsPage";
-import CreatePaymentPage from "../pages/AdminPages/Expense/AddPaymentPage";
-import ListPaymentPage from "../pages/AdminPages/Expense/ListPaymentPage";
-import CreateDebitNotePage from "../pages/AdminPages/Expense/AddDebitNotePage";
-import ListDebitNotesPage from "../pages/AdminPages/Expense/ListDebitNotesPage";
-import CreateWingPage from "../pages/AdminPages/MasterSetup/AddWingPage";
-import ListWingsPage from "../pages/AdminPages/MasterSetup/ListWingsPage";
-import CreateBankPage from "../pages/AdminPages/MasterSetup/AddBankPage";
-import ListBankPage from "../pages/AdminPages/MasterSetup/ListBankPage";
-import BankBalancePage from "../pages/AdminPages/Balance/BankBalancePage";
-import BankTransferPage from "../pages/AdminPages/Balance/BankTransferPage";
-import CreateUserPage from "../pages/AdminPages/UserManagement/CreateUserPage";
-import UsersPage from "../pages/AdminPages/UserManagement/UsersPage";
-import CreateRolePage from "../pages/AdminPages/UserManagement/CreateRolePage";
-import RolesPage from "../pages/AdminPages/UserManagement/RolesPage";
+import AddRequisition from "./pages/AdminPages/Requisition/AddRequisitionPage";
+import RequisitionsPage from "./pages/AdminPages/Requisition/RequisitionsPage";
+import AddParchasePage from "./pages/AdminPages/Parchase/AddParchasePage";
+import ListParchasePage from "./pages/AdminPages/Parchase/ListParchase";
+import AddRevenuePage from "./pages/AdminPages/Income/AddRevenuePage";
+import ListRevenuePage from "./pages/AdminPages/Income/ListRevenuePage";
+import AddCreditNotePage from "./pages/AdminPages/Income/AddCreditNotePage";
+import ListCreditNotesPage from "./pages/AdminPages/Income/ListCreditNotesPage";
+import CreateBillPage from "./pages/AdminPages/Expense/AddBillPage";
+import ListBillsPage from "./pages/AdminPages/Expense/ListBillsPage";
+import CreatePaymentPage from "./pages/AdminPages/Expense/AddPaymentPage";
+import ListPaymentPage from "./pages/AdminPages/Expense/ListPaymentPage";
+import CreateDebitNotePage from "./pages/AdminPages/Expense/AddDebitNotePage";
+import ListDebitNotesPage from "./pages/AdminPages/Expense/ListDebitNotesPage";
+import CreateWingPage from "./pages/AdminPages/MasterSetup/AddWingPage";
+import ListWingsPage from "./pages/AdminPages/MasterSetup/ListWingsPage";
+import CreateBankPage from "./pages/AdminPages/MasterSetup/AddBankPage";
+import ListBankPage from "./pages/AdminPages/MasterSetup/ListBankPage";
+import BankBalancePage from "./pages/AdminPages/Balance/BankBalancePage";
+import BankTransferPage from "./pages/AdminPages/Balance/BankTransferPage";
+import CreateUserPage from "./pages/AdminPages/UserManagement/CreateUserPage";
+import UsersPage from "./pages/AdminPages/UserManagement/UsersPage";
+import CreateRolePage from "./pages/AdminPages/UserManagement/CreateRolePage";
+
+import RolesPage from "./pages/AdminPages/UserManagement/RolesPage";
+import CreateCharOfAccountPage from "./pages/AdminPages/DoubleEntry/AddAccountPage";
+import ChartOfAccountsPage from "./pages/AdminPages/DoubleEntry/ChartOfAccountsPage";
 
 export const RouteData: RouteInterface[] = [
 	{
@@ -204,4 +207,16 @@ export const RouteData: RouteInterface[] = [
 		exact: false,
 		component: BankTransferPage,
 	},
+	// chart of account
+	{
+		path: "/admin/chart-of-account/create",
+		exact: false,
+		component: CreateCharOfAccountPage,
+	},
+	{
+		path: "/admin/chart-of-account/list",
+		exact: false,
+		component: ChartOfAccountsPage,
+	},
 ];
+//

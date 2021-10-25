@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import LoginForm from "../../components/Forms/LoginForm";
-import { APPNAME } from "../../data/config";
+import { APPNAME } from "../../config";
 import { Link } from "react-router-dom";
 import { AppContext } from "../../context";
 

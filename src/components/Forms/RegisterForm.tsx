@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState, useContext, useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
-import { BACKEND } from "../../data/config";
+import { BACKEND } from "../../config";
 import Loader from "react-loader-spinner";
 import { toast } from "react-toastify";
 import { AppContext } from "../../context";

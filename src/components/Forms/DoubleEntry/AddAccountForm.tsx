@@ -4,34 +4,32 @@ import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
 
 interface FormData {
-	date: string;
-	amount: string;
-	account_number: string;
-	customer: string;
+	name: string;
+	code: string;
+	account_id: string;
+	type_id: string;
+	is_enabled: boolean;
 	description: string;
-	category: string;
-	reference: string;
 	wing_id: string;
 }
-
-const AddCreditNoteForm: React.FC = () => {
+const AddChartOfAccountForm: React.FC = () => {
 	const [formData, setFormData] = useState<FormData>({
-		date: "",
-		amount: "",
-		account_number: "",
-		customer: "",
+		name: "",
+		code: "",
+		account_id: "",
+		type_id: "",
+		is_enabled: false,
 		description: "",
-		category: "",
-		reference: "",
 		wing_id: "",
 	});
-	const [wings, setWings] = useState([]);
 	const [errors, setErrors] = useState<any>(null);
+	const [wings, setWings] = useState([]);
+	const [accounts, setAccounts] = useState([]);
 	useEffect(() => {
-		loadWings();
+		loadWingsAndAccounts();
 	}, []);
 
-	const loadWings = () => {
+	const loadWingsAndAccounts = () => {
 		apiClient()
 			.get(`${BACKENDAPI}/v1.0/wings/all`)
 			.then((response: any) => {
@@ -41,30 +39,82 @@ const AddCreditNoteForm: React.FC = () => {
 			.catch((error) => {
 				console.log(error.response);
 			});
+		apiClient()
+			.get(`${BACKENDAPI}/v1.0/accounts`)
+			.then((response: any) => {
+				console.log(response);
+				setAccounts(response.data.accounts);
+			})
+			.catch((error) => {
+				console.log(error.response);
+			});
 	};
+	const [types, setTypes] = useState<any>([]);
+	const accounts2 = [
+		{
+			id: 1,
+			name: "assets",
+			types: [
+				{
+					id: 1,
+					name: "Current Asset",
+				},
+				{
+					id: 2,
+					name: "Fixed Asset",
+				},
+			],
+		},
+		{
+			id: 2,
+			name: "Liabilities",
+			types: [
+				{
+					id: 3,
+					name: "Current Liability",
+				},
+				{
+					id: 4,
+					name: "Liability",
+				},
+			],
+		},
+	];
 
 	// handle Change Function
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
-	const handleTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setFormData({
-			...formData,
-			[e.target.name]: e.target.value,
-		});
+	const handleChecked = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setFormData({ ...formData, [e.target.name]: e.target.checked });
+	};
+	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 	const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
+		if (e.target.name == "account_id") {
+			if (e.target.value) {
+				accounts.map((el: any) => {
+					console.log(el);
+					if (parseInt(el.id) === parseInt(e.target.value)) {
+						setTypes(el.types);
+					}
+				});
+			} else {
+				setTypes([]);
+			}
+		}
 	};
+
 	const resetFunction = () => {
 		setFormData({
-			date: "",
-			amount: "",
-			account_number: "",
-			customer: "",
+			name: "",
+			code: "",
+			account_id: "",
+			type_id: "",
+			is_enabled: false,
 			description: "",
-			category: "",
-			reference: "",
 			wing_id: "",
 		});
 	};
@@ -74,10 +124,10 @@ const AddCreditNoteForm: React.FC = () => {
 		console.log(formData);
 		setErrors(null);
 		apiClient()
-			.post(`${BACKENDAPI}/v1.0/credit-notes`, { ...formData })
+			.post(`${BACKENDAPI}/v1.0/chart-of-account`, { ...formData })
 			.then((response) => {
 				console.log(response);
-				toast.success("credit note saved");
+				toast.success("Account saved");
 				resetFunction();
 			})
 			.catch((error) => {
@@ -130,105 +180,149 @@ const AddCreditNoteForm: React.FC = () => {
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
 			<div className="col-md-6">
-				<label htmlFor="date" className="form-label">
-					Date
+				<label htmlFor="name" className="form-label">
+					Name
 				</label>
 				<input
-					type="date"
+					type="text"
 					className={
 						errors
-							? errors.date
+							? errors.name
 								? `form-control is-invalid`
 								: `form-control is-valid`
 							: "form-control"
 					}
-					id="date"
-					name="date"
+					id="name"
+					name="name"
 					onChange={handleChange}
-					value={formData.date}
+					value={formData.name}
 				/>
 
-				{errors?.date && (
-					<div className="invalid-feedback">{errors.date[0]}</div>
+				{errors?.name && (
+					<div className="invalid-feedback">{errors.name[0]}</div>
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
 			<div className="col-md-6">
-				<label htmlFor="amount" className="form-label">
-					Amount
+				<label htmlFor="code" className="form-label">
+					Code
 				</label>
 				<input
-					type="number"
+					type="text"
 					className={
 						errors
-							? errors.amount
+							? errors.code
 								? `form-control is-invalid`
 								: `form-control is-valid`
 							: "form-control"
 					}
-					id="amount"
-					name="amount"
+					id="code"
+					name="code"
 					onChange={handleChange}
-					value={formData.amount}
+					value={formData.code}
 				/>
 
-				{errors?.amount && (
-					<div className="invalid-feedback">{errors.amount[0]}</div>
+				{errors?.code && (
+					<div className="invalid-feedback">{errors.code[0]}</div>
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
 			<div className="col-md-6">
-				<label htmlFor="account_number" className="form-label">
+				<label htmlFor="account_id" className="form-label">
 					Account
 				</label>
-				<input
-					type="text"
+				<select
 					className={
 						errors
-							? errors.account_number
+							? errors.account_id
 								? `form-control is-invalid`
 								: `form-control is-valid`
 							: "form-control"
 					}
-					id="account_number"
-					name="account_number"
-					onChange={handleChange}
-					value={formData.account_number}
-				/>
+					id="account_id"
+					name="account_id"
+					onChange={handleSelect}
+					value={formData.account_id}>
+					<option value="">Please Select</option>
+					{accounts.length &&
+						accounts.map((el: any, index) => (
+							<option
+								key={index}
+								value={el.id}
+								style={{ textTransform: "capitalize" }}>
+								{el.name}
+							</option>
+						))}
+				</select>
 
-				{errors?.account_number && (
-					<div className="invalid-feedback">
-						{errors.account_number[0]}
-					</div>
+				{errors?.account_id && (
+					<div className="invalid-feedback">{errors.account_id[0]}</div>
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
 			<div className="col-md-6">
-				<label htmlFor="customer" className="form-label">
-					Customer
+				<label htmlFor="type_id" className="form-label">
+					Type
 				</label>
-				<input
-					type="text"
+				<select
 					className={
 						errors
-							? errors.customer
+							? errors.type_id
 								? `form-control is-invalid`
 								: `form-control is-valid`
 							: "form-control"
 					}
-					id="customer"
-					name="customer"
-					onChange={handleChange}
-					value={formData.customer}
-				/>
+					id="type_id"
+					name="type_id"
+					onChange={handleSelect}
+					value={formData.type_id}>
+					<option value="">Please Select</option>
 
-				{errors?.customer && (
-					<div className="invalid-feedback">{errors.customer[0]}</div>
+					{types.length &&
+						types.map((el: any, index: any) => (
+							<option
+								key={index}
+								value={el.id}
+								style={{ textTransform: "capitalize" }}>
+								{el.name}
+							</option>
+						))}
+				</select>
+
+				{errors?.type_id && (
+					<div className="invalid-feedback">{errors.type_id[0]}</div>
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
+
 			<div className="col-md-12">
-				<label htmlFor="date" className="form-label">
+				<div className="form-check">
+					<input
+						className={
+							errors
+								? errors.is_enabled
+									? `form-check-input is-invalid`
+									: `form-check-input is-valid`
+								: "form-check-input"
+						}
+						type="checkbox"
+						id="is_enabled"
+						name="is_enabled"
+						onChange={handleChecked}
+						checked={formData.is_enabled}
+					/>
+
+					{errors?.is_enabled && (
+						<div className="invalid-feedback">{errors.is_enabled[0]}</div>
+					)}
+					{errors && <div className="valid-feedback">Looks good!</div>}
+					<label className="form-check-label" htmlFor="discount_apply">
+						Is Enabled
+					</label>
+				</div>
+			</div>
+			<div className="col-md-12">
+				<label htmlFor="description" className="form-label">
 					Description
 				</label>
 				<textarea
@@ -241,59 +335,11 @@ const AddCreditNoteForm: React.FC = () => {
 					}
 					id="description"
 					name="description"
-					onChange={handleTextArea}
+					onChange={handleChangeTextArea}
 					value={formData.description}></textarea>
 
 				{errors?.description && (
 					<div className="invalid-feedback">{errors.description[0]}</div>
-				)}
-				{errors && <div className="valid-feedback">Looks good!</div>}
-			</div>
-			<div className="col-md-6">
-				<label htmlFor="category" className="form-label">
-					Category
-				</label>
-				<input
-					type="text"
-					className={
-						errors
-							? errors.category
-								? `form-control is-invalid`
-								: `form-control is-valid`
-							: "form-control"
-					}
-					id="category"
-					name="category"
-					onChange={handleChange}
-					value={formData.category}
-				/>
-
-				{errors?.category && (
-					<div className="invalid-feedback">{errors.category[0]}</div>
-				)}
-				{errors && <div className="valid-feedback">Looks good!</div>}
-			</div>
-			<div className="col-md-6">
-				<label htmlFor="category" className="form-label">
-					Reference
-				</label>
-				<input
-					type="text"
-					className={
-						errors
-							? errors.reference
-								? `form-control is-invalid`
-								: `form-control is-valid`
-							: "form-control"
-					}
-					id="reference"
-					name="reference"
-					onChange={handleChange}
-					value={formData.reference}
-				/>
-
-				{errors?.reference && (
-					<div className="invalid-feedback">{errors.reference[0]}</div>
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
@@ -316,4 +362,4 @@ const AddCreditNoteForm: React.FC = () => {
 	);
 };
 
-export default AddCreditNoteForm;
+export default AddChartOfAccountForm;

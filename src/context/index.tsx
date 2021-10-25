@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { BACKENDAPI } from "../data/config";
+import { BACKENDAPI } from "../config";
 import { apiClient } from "../utils/apiClient";
 const defaultContext = {
 	user: null,

@@ -18,7 +18,7 @@ import Admin from "./pages/AdminPages/DemoAdmin";
 import AddProductPage from "./pages/AdminPages/Product/AddProductPage";
 import BrandPage from "./pages/AdminPages/Product/Brand/BrandPage";
 import ListProductPage from "./pages/AdminPages/Product/ListProductPage";
-import { RouteData } from "./data/RoutesData";
+import { RouteData } from "./Routes";
 import "./app.css";
 
 const App: React.FC = () => {

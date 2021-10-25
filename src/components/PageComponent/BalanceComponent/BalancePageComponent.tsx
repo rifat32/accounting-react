@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BACKENDAPI } from "../../../data/config";
+import { BACKENDAPI } from "../../../config";
 import { apiClient } from "../../../utils/apiClient";
 
 interface FormData {

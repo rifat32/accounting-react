@@ -182,4 +182,19 @@ export const adminSideBarData: NavInterface[] = [
 			},
 		],
 	},
+	{
+		name: "Double Entry",
+		list: [
+			{
+				name: "Create Account",
+				link: "/admin/chart-of-account/create",
+				permissions: [],
+			},
+			{
+				name: "Chart of Accounts",
+				link: "/admin/chart-of-account/list",
+				permissions: [],
+			},
+		],
+	},
 ];

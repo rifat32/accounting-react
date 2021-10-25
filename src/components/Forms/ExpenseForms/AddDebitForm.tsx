@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BACKENDAPI } from "../../../data/config";
+import { BACKENDAPI } from "../../../config";
 import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
 
@@ -201,7 +201,9 @@ const AddDebitForm: React.FC = () => {
 				/>
 
 				{errors?.account_number && (
-					<div className="invalid-feedback">{errors.account_number[0]}</div>
+					<div className="invalid-feedback">
+						{errors.account_number[0]}
+					</div>
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>

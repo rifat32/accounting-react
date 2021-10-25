@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BACKENDAPI } from "../../../data/config";
+import { BACKENDAPI } from "../../../config";
 import { apiClient } from "../../../utils/apiClient";
 import CustomModal from "../../Modal/Modal";
 import AddBankForm from "../../Forms/MasterSetupForms/AddBankForm";

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { APPNAME } from "../../data/config";
+import { APPNAME } from "../../config";
 import RegisterForm from "../../components/Forms/RegisterForm";
 import { Link } from "react-router-dom";
 import { AppContext } from "../../context";
