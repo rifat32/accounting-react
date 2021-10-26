@@ -180,6 +180,11 @@ export const adminSideBarData: NavInterface[] = [
 				link: "/admin/bank/transfer",
 				permissions: ["transfer fund"],
 			},
+			{
+				name: "Balance Transfer History",
+				link: "/admin/bank/transfer/history",
+				permissions: [],
+			},
 		],
 	},
 	{

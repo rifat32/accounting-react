@@ -4,20 +4,23 @@ import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
 
 const RequisitionsPageComponent: React.FC = () => {
-	const [requisitions, setRequisitions] = useState([]);
-	const [currentLink, setCurrentLink] = useState(
-		`${BACKENDAPI}/v1.0/requisitions`
-	);
+	const [data, setData] = useState<any>([]);
+
+	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/requisitions`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
 	useEffect(() => {
-		loadRequisitions();
+		loadData(link);
 	}, []);
 	// pagination required
-	const loadRequisitions = () => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response);
-				setRequisitions(response.data.requisitions.data);
+				setData([...data, ...response.data.requisitions.data]);
+				setNextPageLink(response.data.requisitions.next_page_url);
+				setPrevPageLink(response.data.requisitions.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response, "ggg");
@@ -30,10 +33,10 @@ const RequisitionsPageComponent: React.FC = () => {
 			})
 			.then((response: any) => {
 				console.log(response);
-				const newRequisitions = requisitions.filter((el: any) => {
+				const newRequisitions = data.filter((el: any) => {
 					return el.id !== id;
 				});
-				setRequisitions(newRequisitions);
+				setData(newRequisitions);
 				toast("Moved To Parchase");
 			})
 			.catch((error) => {
@@ -64,9 +67,9 @@ const RequisitionsPageComponent: React.FC = () => {
 						<th scope="col">Action</th>
 					</tr>
 				</thead>
-				{requisitions.length ? (
+				{data.length ? (
 					<tbody>
-						{requisitions.map((el: any) => {
+						{data.map((el: any) => {
 							return (
 								<tr key={el.id}>
 									<td>{el.wing.name}</td>
@@ -93,6 +96,25 @@ const RequisitionsPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
 		</>
 	);
 };

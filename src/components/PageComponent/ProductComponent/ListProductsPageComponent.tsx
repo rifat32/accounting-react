@@ -12,10 +12,11 @@ const ListProductsPageComponent: React.FC = () => {
 		setIsOpen(show);
 	};
 	const [currentData, setCurrentData] = useState<any>(null);
+
 	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/products`);
-	const [currentLink, setCurrentLink] = useState(
-		`${BACKENDAPI}/v1.0/products`
-	);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
+
 	const updateDataStates = (updatedData: any) => {
 		const tempDatas = data.map((el: any) => {
 			if (parseInt(el.id) === parseInt(updatedData.id)) {
@@ -31,12 +32,14 @@ const ListProductsPageComponent: React.FC = () => {
 	}, []);
 
 	// pagination required
-	const loadData = (link: string = currentLink) => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response.data.products);
-				setData(response.data.products.data);
+				setData([...data, ...response.data.products.data]);
+				setNextPageLink(response.data.products.next_page_url);
+				setPrevPageLink(response.data.products.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
@@ -79,13 +82,13 @@ const ListProductsPageComponent: React.FC = () => {
 						{data.map((el: any) => {
 							return (
 								<tr key={el.id}>
-									<td>{el.wing.name}</td>
-									<td>{el.name}</td>
-									<td>{el.brand}</td>
-									<td>{el.category}</td>
-									<td>{el.sku}</td>
+									<td>{el.wing?.name && el.wing.name}</td>
+									<td>{el.name && el.name}</td>
+									<td>{el.brand && el.brand}</td>
+									<td>{el.category && el.category}</td>
+									<td>{el.sku && el.sku}</td>
 									{/* <td>{el.pQuantity}</td> */}
-									<td>{el.price}</td>
+									<td>{el.price && el.price}</td>
 									<td>
 										<div className="btn-group">
 											<button
@@ -132,6 +135,25 @@ const ListProductsPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
 			<CustomModal
 				isOpen={modalIsOpen}
 				showModal={showModal}

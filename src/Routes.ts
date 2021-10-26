@@ -34,6 +34,8 @@ import CreateRolePage from "./pages/AdminPages/UserManagement/CreateRolePage";
 import RolesPage from "./pages/AdminPages/UserManagement/RolesPage";
 import CreateCharOfAccountPage from "./pages/AdminPages/DoubleEntry/AddAccountPage";
 import ChartOfAccountsPage from "./pages/AdminPages/DoubleEntry/ChartOfAccountsPage";
+import ListTransfersPageComponent from "./components/PageComponent/BalanceComponent/ListTransfersPageComponent";
+import ListTransfersPage from "./pages/AdminPages/Balance/BankTransferHistory";
 
 export const RouteData: RouteInterface[] = [
 	{
@@ -204,8 +206,13 @@ export const RouteData: RouteInterface[] = [
 	},
 	{
 		path: "/admin/bank/transfer",
-		exact: false,
+		exact: true,
 		component: BankTransferPage,
+	},
+	{
+		path: "/admin/bank/transfer/history",
+		exact: false,
+		component: ListTransfersPage,
 	},
 	// chart of account
 	{

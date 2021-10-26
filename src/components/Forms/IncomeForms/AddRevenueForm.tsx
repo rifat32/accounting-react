@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BACKENDAPI } from "../../../config";
 import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
+import { UpdateFormInterface } from "../../../interfaces/UpdateFormInterfaced";
 
 interface FormData {
 	date: string;
@@ -13,7 +14,7 @@ interface FormData {
 	reference: string;
 	wing_id: string;
 }
-const AddRevenueForm: React.FC = () => {
+const AddRevenueForm: React.FC<UpdateFormInterface> = (props) => {
 	const [formData, setFormData] = useState<FormData>({
 		date: "",
 		amount: "",
@@ -72,6 +73,14 @@ const AddRevenueForm: React.FC = () => {
 		e.preventDefault();
 		console.log(formData);
 		setErrors(null);
+		if (props.type === "update") {
+			updateData();
+		} else {
+			createData();
+		}
+	};
+
+	const createData = () => {
 		apiClient()
 			.post(`${BACKENDAPI}/v1.0/revenues`, { ...formData })
 			.then((response) => {
@@ -81,6 +90,36 @@ const AddRevenueForm: React.FC = () => {
 			})
 			.catch((error) => {
 				console.log(error.response);
+				if (
+					error.response.status === 404 ||
+					error.response.status === 400
+				) {
+					toast.error(error.response.data.message);
+				}
+				if (error.response.status === 422) {
+					toast.error("invalid input");
+					setErrors(error.response.data.errors);
+				}
+			});
+	};
+	// edit options @@@@@@@@@@@@@@@@@@@@@@@@@@
+	useEffect(() => {
+		if (props.type == "update") {
+			setFormData(props.value);
+		}
+	}, []);
+	const updateData = () => {
+		apiClient()
+			.put(`${BACKENDAPI}/v1.0/revenues`, { ...formData })
+			.then((response: any) => {
+				console.log(response);
+				toast.success("data updated");
+				props.updateDataStates(response.data.revenue);
+				props.showModal(false);
+			})
+			.catch((error) => {
+				console.log(error.response);
+
 				if (
 					error.response.status === 404 ||
 					error.response.status === 400

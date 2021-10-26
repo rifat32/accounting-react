@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { BACKENDAPI } from "../../../config";
 import { apiClient } from "../../../utils/apiClient";
-import { Link } from "react-router-dom";
-import Modal from "react-modal";
 import AddWingForm from "../../Forms/MasterSetupForms/AddWingsForm";
 import CustomModal from "../../Modal/Modal";
-import EditWingForm from "../../Forms/MasterSetupForms/EditWingsForm";
+
 import { toast } from "react-toastify";
 
 const WingsPageComponent: React.FC = () => {
@@ -15,8 +13,11 @@ const WingsPageComponent: React.FC = () => {
 		setIsOpen(show);
 	};
 	const [currentData, setCurrentData] = useState<any>(null);
+
 	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/wings`);
-	const [currentLink, setCurrentLink] = useState(`${BACKENDAPI}/v1.0/wings`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
+
 	const updateDataStates = (updatedWing: any) => {
 		const tempWings = data.map((el: any) => {
 			if (el.id === updatedWing.id) {
@@ -30,12 +31,14 @@ const WingsPageComponent: React.FC = () => {
 		loadData(link);
 	}, []);
 	// pagination required
-	const loadData = (link: string = currentLink) => {
+	const loadData = (link: string) => {
 		apiClient()
 			.get(link)
 			.then((response: any) => {
 				console.log(response);
 				setData([...data, ...response.data.wings.data]);
+				setNextPageLink(response.data.wings.next_page_url);
+				setPrevPageLink(response.data.wings.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
@@ -121,6 +124,25 @@ const WingsPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
 			<CustomModal
 				isOpen={modalIsOpen}
 				showModal={showModal}

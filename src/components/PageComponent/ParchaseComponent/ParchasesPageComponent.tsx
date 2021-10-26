@@ -4,20 +4,25 @@ import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
 
 const ParchasesPageComponent: React.FC = () => {
-	const [parchased, setParchases] = useState([]);
-	const [currentLink, setCurrentLink] = useState(
-		`${BACKENDAPI}/v1.0/parchases`
-	);
+	const [data, setData] = useState<any>([]);
+
+	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/parchases`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
+
 	useEffect(() => {
-		loadParchases();
+		loadData(link);
 	}, []);
 	// pagination required
-	const loadParchases = () => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response);
-				setParchases(response.data.parchases.data);
+
+				setData([...data, ...response.data.parchases.data]);
+				setNextPageLink(response.data.parchases.next_page_url);
+				setPrevPageLink(response.data.parchases.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
@@ -26,18 +31,6 @@ const ParchasesPageComponent: React.FC = () => {
 
 	return (
 		<>
-			{/* 
-		
-		   // {
-            //     "rSupplier": "",
-            //     "rReferenceNo": "",
-            //     "rPurchaseDate": "",
-            //     "rPurchaseStatus": "",
-            //     "rProductId": 2,
-            //     "rAmount": "",
-            //     "rPaymentMethod": ""
-            // }
-		*/}
 			<table className="table">
 				<thead>
 					<tr>
@@ -52,9 +45,9 @@ const ParchasesPageComponent: React.FC = () => {
 						<th scope="col">Payment Method</th>
 					</tr>
 				</thead>
-				{parchased.length ? (
+				{data.length ? (
 					<tbody>
-						{parchased.map((el: any) => {
+						{data.map((el: any) => {
 							return (
 								<tr key={el.id}>
 									<td>{el.wing.name}</td>
@@ -62,7 +55,6 @@ const ParchasesPageComponent: React.FC = () => {
 									<td>{el.reference_no}</td>
 									<td>{el.purchase_date}</td>
 									<td>{el.purchase_status}</td>
-									{/* <td>{el.rProductId}</td> */}
 									<td>{el.product.name}</td>
 									<td>{el.product.price}</td>
 									<td>{el.payment_method}</td>
@@ -72,6 +64,25 @@ const ParchasesPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
 		</>
 	);
 };

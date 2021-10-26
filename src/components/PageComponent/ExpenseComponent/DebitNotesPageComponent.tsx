@@ -4,20 +4,24 @@ import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
 
 const DebitNotesPageComponent: React.FC = () => {
-	const [debitNotes, setDebitNotes] = useState([]);
-	const [currentLink, setCurrentLink] = useState(
-		`${BACKENDAPI}/v1.0/debit-notes`
-	);
+	const [data, setData] = useState<any>([]);
+
+	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/debit-notes`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
+
 	useEffect(() => {
-		loadDebitNotes();
+		loadData(link);
 	}, []);
 	// pagination required
-	const loadDebitNotes = () => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response);
-				setDebitNotes(response.data.debitNotes.data);
+				setData([...data, ...response.data.debitNotes.data]);
+				setNextPageLink(response.data.debitNotes.next_page_url);
+				setPrevPageLink(response.data.debitNotes.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
@@ -30,13 +34,13 @@ const DebitNotesPageComponent: React.FC = () => {
 			})
 			.then((response: any) => {
 				toast.success("debit note approved");
-				const tempRevenue: any = debitNotes.map((el: any) => {
+				const tempRevenue: any = data.map((el: any) => {
 					if (el.id === id) {
 						el.status = 1;
 					}
 					return el;
 				});
-				setDebitNotes(tempRevenue);
+				setData(tempRevenue);
 
 				console.log(response);
 			})
@@ -61,9 +65,9 @@ const DebitNotesPageComponent: React.FC = () => {
 					</tr>
 				</thead>
 
-				{debitNotes.length ? (
+				{data.length ? (
 					<tbody>
-						{debitNotes.map((el: any) => {
+						{data.map((el: any) => {
 							return (
 								<tr key={el.id}>
 									<td>{el.wing.name}</td>
@@ -97,6 +101,25 @@ const DebitNotesPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
 		</>
 	);
 };

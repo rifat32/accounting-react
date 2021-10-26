@@ -2,22 +2,34 @@ import React, { useState, useEffect } from "react";
 import { BACKENDAPI } from "../../../config";
 import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
+import CustomModal from "../../Modal/Modal";
+import AddCreditNoteForm from "../../Forms/IncomeForms/AddCreditNoteForm";
 
 const CreditNotesPageComponent: React.FC = () => {
-	const [creditNotes, setCreditNotes] = useState([]);
-	const [currentLink, setCurrentLink] = useState(
-		`${BACKENDAPI}/v1.0/credit-notes`
-	);
+	const [data, setData] = useState<any>([]);
+
+	const [modalIsOpen, setIsOpen] = React.useState(false);
+	const showModal = (show: boolean) => {
+		setIsOpen(show);
+	};
+	const [currentData, setCurrentData] = useState<any>(null);
+
+	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/credit-notes`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
+
 	useEffect(() => {
-		loadCreditNotes();
+		loadData(link);
 	}, []);
 	// pagination required
-	const loadCreditNotes = () => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response);
-				setCreditNotes(response.data.creditNotes.data);
+				setData([...data, ...response.data.creditNotes.data]);
+				setNextPageLink(response.data.creditNotes.next_page_url);
+				setPrevPageLink(response.data.creditNotes.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
@@ -30,13 +42,13 @@ const CreditNotesPageComponent: React.FC = () => {
 			})
 			.then((response: any) => {
 				toast.success("credit notes approved");
-				const tempRevenue: any = creditNotes.map((el: any) => {
+				const tempRevenue: any = data.map((el: any) => {
 					if (el.id === id) {
 						el.status = 1;
 					}
 					return el;
 				});
-				setCreditNotes(tempRevenue);
+				setData(tempRevenue);
 
 				console.log(response);
 			})
@@ -44,7 +56,32 @@ const CreditNotesPageComponent: React.FC = () => {
 				console.log(error.response);
 			});
 	};
-
+	const updateDataStates = (updatedWing: any) => {
+		const tempWings = data.map((el: any) => {
+			if (el.id === updatedWing.id) {
+				return updatedWing;
+			}
+			return el;
+		});
+		setData(tempWings);
+	};
+	const deleteData = (id: number) => {
+		if (window.confirm("Are you sure  want to delete ?")) {
+			apiClient()
+				.delete(`${BACKENDAPI}/v1.0/credit-notes/${id}`)
+				.then((response: any) => {
+					console.log(response);
+					const tempDatas = data.filter((el: any) => {
+						return el.id !== id;
+					});
+					setData(tempDatas);
+					toast.success("data deleted successfully");
+				})
+				.catch((error) => {
+					console.log(error.response);
+				});
+		}
+	};
 	return (
 		<>
 			<table className="table">
@@ -62,9 +99,9 @@ const CreditNotesPageComponent: React.FC = () => {
 						<th scope="col">Action</th>
 					</tr>
 				</thead>
-				{creditNotes.length ? (
+				{data.length ? (
 					<tbody>
-						{creditNotes.map((el: any) => {
+						{data.map((el: any) => {
 							return (
 								<tr key={el.id}>
 									<td>{el.wing.name}</td>
@@ -76,21 +113,56 @@ const CreditNotesPageComponent: React.FC = () => {
 									<td>{el.category}</td>
 									<td>{el.reference}</td>
 									<td>{el.status ? "approved" : "pending"}</td>
+
 									<td>
-										<div className="dropdown">
-											<span className="btn btn-primary btn-sm">
+										<div className="btn-group">
+											<button
+												type="button"
+												className="btn btn-sm btn-primary dropdown-toggle"
+												data-bs-toggle="dropdown"
+												aria-expanded="false">
 												Action
-											</span>
-											<div className="dropdown-content">
-												<div className="d-grid gap-2">
-													<button
-														className="btn d_btn btn-sm"
-														type="button"
-														onClick={() => ApproveFunc(el.id)}>
+											</button>
+											<ul className="dropdown-menu action">
+												<li>
+													<a
+														onClick={() => {
+															setCurrentData(el);
+															showModal(true);
+														}}
+														className="dropdown-item"
+														href="#">
+														edit
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li>
+												<li>
+													<a
+														onClick={() => ApproveFunc(el.id)}
+														className="dropdown-item"
+														href="#">
 														Approve
-													</button>
-												</div>
-											</div>
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li>
+												<li>
+													<a
+														onClick={() => {
+															deleteData(el.id);
+														}}
+														className="dropdown-item"
+														href="#">
+														delete
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li>
+											</ul>
 										</div>
 									</td>
 								</tr>
@@ -99,6 +171,36 @@ const CreditNotesPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
+			<CustomModal
+				isOpen={modalIsOpen}
+				showModal={showModal}
+				type="Update Wing">
+				<AddCreditNoteForm
+					value={currentData}
+					updateDataStates={updateDataStates}
+					showModal={showModal}
+					type="update"
+				/>
+			</CustomModal>
 		</>
 	);
 };

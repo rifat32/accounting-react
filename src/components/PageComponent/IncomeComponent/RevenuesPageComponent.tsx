@@ -2,23 +2,32 @@ import React, { useState, useEffect } from "react";
 import { BACKENDAPI } from "../../../config";
 import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
+import AddRevenueForm from "../../Forms/IncomeForms/AddRevenueForm";
+import CustomModal from "../../Modal/Modal";
 
 const RevenuesPageComponent: React.FC = () => {
-	const [revenues, setRevenues] = useState([]);
-	const [currentLink, setCurrentLink] = useState(
-		`${BACKENDAPI}/v1.0/revenues`
-	);
+	const [data, setData] = useState<any>([]);
+	const [modalIsOpen, setIsOpen] = React.useState(false);
+	const showModal = (show: boolean) => {
+		setIsOpen(show);
+	};
+	const [currentData, setCurrentData] = useState<any>(null);
+
+	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/revenues`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
 	useEffect(() => {
-		loadRevenues();
+		loadData(link);
 	}, []);
 	// pagination required
-	const loadRevenues = () => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response);
-
-				setRevenues(response.data.revenues.data);
+				setData([...data, ...response.data.revenues.data]);
+				setNextPageLink(response.data.revenues.next_page_url);
+				setPrevPageLink(response.data.revenues.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
@@ -31,19 +40,45 @@ const RevenuesPageComponent: React.FC = () => {
 			})
 			.then((response: any) => {
 				toast.success("revenue approved");
-				const tempRevenue: any = revenues.map((el: any) => {
+				const tempRevenue: any = data.map((el: any) => {
 					if (el.id === id) {
 						el.status = 1;
 					}
 					return el;
 				});
-				setRevenues(tempRevenue);
+				setData(tempRevenue);
 
 				console.log(response);
 			})
 			.catch((error) => {
 				console.log(error.response);
 			});
+	};
+	const updateDataStates = (updatedWing: any) => {
+		const tempWings = data.map((el: any) => {
+			if (el.id === updatedWing.id) {
+				return updatedWing;
+			}
+			return el;
+		});
+		setData(tempWings);
+	};
+	const deleteData = (id: number) => {
+		if (window.confirm("Are you sure  want to delete ?")) {
+			apiClient()
+				.delete(`${BACKENDAPI}/v1.0/revenues/${id}`)
+				.then((response: any) => {
+					console.log(response);
+					const tempDatas = data.filter((el: any) => {
+						return el.id !== id;
+					});
+					setData(tempDatas);
+					toast.success("data deleted successfully");
+				})
+				.catch((error) => {
+					console.log(error.response);
+				});
+		}
 	};
 
 	return (
@@ -63,9 +98,9 @@ const RevenuesPageComponent: React.FC = () => {
 						<th scope="col">Action</th>
 					</tr>
 				</thead>
-				{revenues.length ? (
+				{data.length ? (
 					<tbody>
-						{revenues.map((el: any, index) => {
+						{data.map((el: any) => {
 							return (
 								<tr key={el.id}>
 									<td>{el.wing.name}</td>
@@ -77,21 +112,56 @@ const RevenuesPageComponent: React.FC = () => {
 									<td>{el.category}</td>
 									<td>{el.reference}</td>
 									<td>{el.status ? "approved" : "pending"}</td>
+
 									<td>
-										<div className="dropdown">
-											<span className="btn btn-primary btn-sm">
+										<div className="btn-group">
+											<button
+												type="button"
+												className="btn btn-sm btn-primary dropdown-toggle"
+												data-bs-toggle="dropdown"
+												aria-expanded="false">
 												Action
-											</span>
-											<div className="dropdown-content">
-												<div className="d-grid gap-2">
-													<button
-														className="btn d_btn btn-sm"
-														type="button"
-														onClick={() => ApproveFunc(el.id)}>
+											</button>
+											<ul className="dropdown-menu action">
+												<li>
+													<a
+														onClick={() => {
+															setCurrentData(el);
+															showModal(true);
+														}}
+														className="dropdown-item"
+														href="#">
+														edit
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li>
+												<li>
+													<a
+														onClick={() => ApproveFunc(el.id)}
+														className="dropdown-item"
+														href="#">
 														Approve
-													</button>
-												</div>
-											</div>
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li>
+												<li>
+													<a
+														onClick={() => {
+															deleteData(el.id);
+														}}
+														className="dropdown-item"
+														href="#">
+														delete
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li>
+											</ul>
 										</div>
 									</td>
 								</tr>
@@ -100,6 +170,36 @@ const RevenuesPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
+			<CustomModal
+				isOpen={modalIsOpen}
+				showModal={showModal}
+				type="Update Wing">
+				<AddRevenueForm
+					value={currentData}
+					updateDataStates={updateDataStates}
+					showModal={showModal}
+					type="update"
+				/>
+			</CustomModal>
 		</>
 	);
 };

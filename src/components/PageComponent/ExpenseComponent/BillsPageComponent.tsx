@@ -4,18 +4,24 @@ import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
 
 const BillsPageComponent: React.FC = () => {
-	const [bills, setBills] = useState([]);
-	const [currentLink, setCurrentLink] = useState(`${BACKENDAPI}/v1.0/bills`);
+	const [data, setData] = useState<any>([]);
+
+	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/bills`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
+
 	useEffect(() => {
-		loadBills();
+		loadData(link);
 	}, []);
 	// pagination required
-	const loadBills = () => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response);
-				setBills(response.data.bills.data);
+				setData([...data, ...response.data.bills.data]);
+				setNextPageLink(response.data.bills.next_page_url);
+				setPrevPageLink(response.data.bills.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
@@ -36,20 +42,10 @@ const BillsPageComponent: React.FC = () => {
 						<th scope="col">Discount Apply</th>
 					</tr>
 				</thead>
-				{/* 
-		
-		 // {
-            //     "vendor": "abcd",
-            //     "billDate": "2021-10-14",
-            //     "dueDate": "2021-10-15",
-            //     "category": "eargeg",
-            //     "orderNumber": "efewsf",
-            //     "discountApply": false
-            // }
-		*/}
-				{bills.length ? (
+
+				{data.length ? (
 					<tbody>
-						{bills.map((el: any) => {
+						{data.map((el: any) => {
 							return (
 								<tr key={el.id}>
 									<td>{el.wing.name}</td>
@@ -65,6 +61,25 @@ const BillsPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
 		</>
 	);
 };

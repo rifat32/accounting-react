@@ -4,22 +4,45 @@ import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
 
 const UsersPageComponent: React.FC = () => {
-	const [users, setUsers] = useState([]);
-	const [currentLink, setCurrentLink] = useState(`${BACKENDAPI}/v1.0/users`);
+	const [data, setData] = useState<any>([]);
+
+	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/users`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
+
 	useEffect(() => {
-		loadUsers();
+		loadData(link);
 	}, []);
 	// pagination required
-	const loadUsers = () => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response);
-				setUsers(response.data.users.data);
+				setData([...data, ...response.data.users.data]);
+				setNextPageLink(response.data.users.next_page_url);
+				setPrevPageLink(response.data.users.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
 			});
+	};
+	const deleteData = (id: number) => {
+		if (window.confirm("Are you sure  want to delete ?")) {
+			apiClient()
+				.delete(`${BACKENDAPI}/v1.0/users/${id}`)
+				.then((response: any) => {
+					console.log(response);
+					const tempDatas = data.filter((el: any) => {
+						return el.id !== id;
+					});
+					setData(tempDatas);
+					toast.success("data deleted successfully");
+				})
+				.catch((error) => {
+					console.log(error.response);
+				});
+		}
 	};
 
 	return (
@@ -33,9 +56,9 @@ const UsersPageComponent: React.FC = () => {
 						<th scope="col">roles</th>
 					</tr>
 				</thead>
-				{users.length ? (
+				{data.length ? (
 					<tbody>
-						{users.map((el: any) => {
+						{data.map((el: any) => {
 							return (
 								<tr key={el.id}>
 									<td>{el.id}</td>
@@ -50,12 +73,60 @@ const UsersPageComponent: React.FC = () => {
 									) : (
 										<td></td>
 									)}
+									<td>
+										<div className="btn-group">
+											<button
+												type="button"
+												className="btn btn-sm btn-primary dropdown-toggle"
+												data-bs-toggle="dropdown"
+												aria-expanded="false">
+												Action
+											</button>
+											<ul className="dropdown-menu action">
+												<li>
+													<hr className="dropdown-divider" />
+												</li>
+												<li>
+													<a
+														onClick={() => {
+															deleteData(el.id);
+														}}
+														className="dropdown-item"
+														href="#">
+														delete
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li>
+											</ul>
+										</div>
+									</td>
 								</tr>
 							);
 						})}
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
 		</>
 	);
 };

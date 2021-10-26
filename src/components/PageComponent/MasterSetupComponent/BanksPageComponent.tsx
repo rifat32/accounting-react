@@ -13,7 +13,9 @@ const BanksPageComponent: React.FC = () => {
 	};
 	const [currentData, setCurrentData] = useState<any>(null);
 	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/banks`);
-	const [currentLink, setCurrentLink] = useState(`${BACKENDAPI}/v1.0/banks`);
+	const [nextPageLink, setNextPageLink] = useState("");
+	const [prevPageLink, setPrevPageLink] = useState("");
+
 	const updateDataStates = (updatedData: any) => {
 		const tempDatas = data.map((el: any) => {
 			if (parseInt(el.id) === parseInt(updatedData.id)) {
@@ -27,12 +29,14 @@ const BanksPageComponent: React.FC = () => {
 		loadData(link);
 	}, []);
 	// pagination required
-	const loadData = (link: string = currentLink) => {
+	const loadData = (link: string) => {
 		apiClient()
-			.get(currentLink)
+			.get(link)
 			.then((response: any) => {
 				console.log(response);
-				setData(response.data.banks.data);
+				setData([...data, ...response.data.banks.data]);
+				setNextPageLink(response.data.banks.next_page_url);
+				setPrevPageLink(response.data.banks.prev_page_url);
 			})
 			.catch((error) => {
 				console.log(error.response);
@@ -67,13 +71,7 @@ const BanksPageComponent: React.FC = () => {
 						<th>Action</th>
 					</tr>
 				</thead>
-				{/* 
-		// {
-            $table->string("name");
-            $table->string("account_number");
-            $table->string("wing_id");
-            // }
-		*/}
+
 				{data.length ? (
 					<tbody>
 						{data.map((el: any) => {
@@ -128,6 +126,25 @@ const BanksPageComponent: React.FC = () => {
 					</tbody>
 				) : null}
 			</table>
+			<div className="text-center">
+				{nextPageLink ? (
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							loadData(nextPageLink);
+						}}>
+						Load More ...
+					</button>
+				) : data.length ? (
+					prevPageLink ? (
+						"No more data to show"
+					) : (
+						""
+					)
+				) : (
+					"No data to show"
+				)}
+			</div>
 			<CustomModal
 				isOpen={modalIsOpen}
 				showModal={showModal}
