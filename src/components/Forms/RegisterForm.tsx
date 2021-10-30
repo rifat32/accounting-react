@@ -15,6 +15,7 @@ interface RegisterInfo {
 const RegisterForm: React.FC = (props: any) => {
 	const { user, setUserFunction, setUserLoadingFunction } =
 		useContext(AppContext);
+
 	const [state, setState] = useState<RegisterInfo>({
 		name: "",
 		email: "",
@@ -22,14 +23,14 @@ const RegisterForm: React.FC = (props: any) => {
 		password_confirmation: "",
 	});
 	const [loading, setLoading] = useState<boolean>(false);
-	const [errors, setErrors] = useState<string[]>([]);
+	const [errors, setErrors] = useState<any>(null);
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
 	};
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
-		setErrors([]);
+		setErrors(null);
 		setUserLoadingFunction(true);
 		axios
 			.post(`${BACKEND}/api/v1.0/register`, {
@@ -43,13 +44,14 @@ const RegisterForm: React.FC = (props: any) => {
 				setLoading(false);
 				setUserLoadingFunction(false);
 			})
-			.catch((err) => {
+			.catch((error) => {
 				setUserLoadingFunction(false);
-				if (err.response.status === 422) {
-					setErrors(err.response.data.errors);
+				if (error.response.status === 422) {
+					toast.error("invalid input");
+					setErrors(error.response.data.errors);
 				}
 
-				console.log(err.response);
+				console.log(error.response);
 				setLoading(false);
 			});
 	};
@@ -69,12 +71,22 @@ const RegisterForm: React.FC = (props: any) => {
 					<input
 						type="text"
 						name="name"
-						className="form-control"
+						className={
+							errors
+								? errors.name
+									? `form-control is-invalid`
+									: `form-control is-valid`
+								: "form-control"
+						}
 						id="yourPassword"
 						required
 						onChange={handleChange}
 						value={state.name}
 					/>
+					{errors?.name && (
+						<div className="invalid-feedback">{errors.name[0]}</div>
+					)}
+					{errors && <div className="valid-feedback">Looks good!</div>}
 				</div>
 				<div className="col-12">
 					<label htmlFor="yourEmail" className="form-label">
@@ -87,12 +99,22 @@ const RegisterForm: React.FC = (props: any) => {
 						<input
 							type="text"
 							name="email"
-							className="form-control"
+							className={
+								errors
+									? errors.email
+										? `form-control is-invalid`
+										: `form-control is-valid`
+									: "form-control"
+							}
 							id="yourEmail"
 							required
 							onChange={handleChange}
 							value={state.email}
 						/>
+						{errors?.email && (
+							<div className="invalid-feedback">{errors.email[0]}</div>
+						)}
+						{errors && <div className="valid-feedback">Looks good!</div>}
 					</div>
 				</div>
 				<div className="col-12">
@@ -102,12 +124,22 @@ const RegisterForm: React.FC = (props: any) => {
 					<input
 						type="password"
 						name="password"
-						className="form-control"
+						className={
+							errors
+								? errors.password
+									? `form-control is-invalid`
+									: `form-control is-valid`
+								: "form-control"
+						}
 						id="yourPassword"
 						required
 						onChange={handleChange}
 						value={state.password}
 					/>
+					{errors?.password && (
+						<div className="invalid-feedback">{errors.password[0]}</div>
+					)}
+					{errors && <div className="valid-feedback">Looks good!</div>}
 				</div>
 				<div className="col-12">
 					<label htmlFor="yourPassword" className="form-label">
@@ -139,17 +171,6 @@ const RegisterForm: React.FC = (props: any) => {
 														</label>
 													</div>
 												</div> */}
-				{errors.length ? (
-					<div className="col-12">
-						<div>
-							<div
-								className="alert alert-danger py-2 text-center"
-								role="alert">
-								{errors[0]}
-							</div>
-						</div>
-					</div>
-				) : null}
 
 				{loading && (
 					<div className="col-12">

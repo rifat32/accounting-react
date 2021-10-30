@@ -79,20 +79,54 @@ const DebitNotesPageComponent: React.FC = () => {
 									<td>{el.description}</td>
 									<td>{el.status ? "approved" : "pending"}</td>
 									<td>
-										<div className="dropdown">
-											<span className="btn btn-primary btn-sm">
+										<div className="btn-group">
+											<button
+												type="button"
+												className="btn btn-sm btn-primary dropdown-toggle"
+												data-bs-toggle="dropdown"
+												aria-expanded="false">
 												Action
-											</span>
-											<div className="dropdown-content">
-												<div className="d-grid gap-2">
-													<button
-														className="btn d_btn btn-sm"
-														type="button"
-														onClick={() => ApproveFunc(el.id)}>
+											</button>
+											<ul className="dropdown-menu action">
+												{/* <li>
+													<a
+														onClick={() => {
+															setCurrentData(el);
+															showModal(true);
+														}}
+														className="dropdown-item"
+														href="#">
+														edit
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li> */}
+												<li>
+													<a
+														onClick={() => ApproveFunc(el.id)}
+														className="dropdown-item"
+														href="#">
 														Approve
-													</button>
-												</div>
-											</div>
+													</a>
+												</li>
+												{/* <li>
+													<hr className="dropdown-divider" />
+												</li> */}
+												{/* <li>
+													<a
+														onClick={() => {
+															deleteData(el.id);
+														}}
+														className="dropdown-item"
+														href="#">
+														delete
+													</a>
+												</li>
+												<li>
+													<hr className="dropdown-divider" />
+												</li> */}
+											</ul>
 										</div>
 									</td>
 								</tr>

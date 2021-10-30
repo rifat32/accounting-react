@@ -93,6 +93,7 @@ const AddRoleForm: React.FC = () => {
 		setFormData({
 			name: "",
 		});
+		setRoles([]);
 		loadRoles();
 	};
 	// handle submit Function

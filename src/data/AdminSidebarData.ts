@@ -89,6 +89,17 @@ export const adminSideBarData: NavInterface[] = [
 					"create requisition",
 				],
 			},
+			{
+				name: "Requisitions Return",
+				link: "/admin/requisitions/return",
+				permissions: ["approve requisition", "cancel requisition"],
+			},
+
+			{
+				name: "Requisitions Report",
+				link: "/admin/requisitions/report",
+				permissions: ["approve requisition", "cancel requisition"],
+			},
 		],
 	},
 	{
@@ -100,8 +111,19 @@ export const adminSideBarData: NavInterface[] = [
 				permissions: ["create purchase"],
 			},
 			{
-				name: "List Parchase",
+				name: "Purchases",
 				link: "/admin/parchases",
+				permissions: ["purchase return", "create purchase"],
+			},
+			{
+				name: "Purchases Return",
+				link: "/admin/parchases/return",
+				permissions: ["purchase return", "cancel requisition"],
+			},
+
+			{
+				name: "Purchases Report",
+				link: "/admin/parchases/report",
 				permissions: ["purchase return"],
 			},
 		],
@@ -128,6 +150,11 @@ export const adminSideBarData: NavInterface[] = [
 				name: "List Credit Note",
 				link: "/admin/credits",
 				permissions: ["voucher approval", "add credit voucher"],
+			},
+			{
+				name: "Income Report",
+				link: "/admin/income/report",
+				permissions: [],
 			},
 		],
 	},
@@ -165,6 +192,11 @@ export const adminSideBarData: NavInterface[] = [
 				link: "/admin/debitNotes",
 				permissions: ["approve voucher", "add debit voucher"],
 			},
+			{
+				name: "Expense Report",
+				link: "/admin/expense/report",
+				permissions: [],
+			},
 		],
 	},
 	{
@@ -175,16 +207,16 @@ export const adminSideBarData: NavInterface[] = [
 				link: "/admin/bank/balance",
 				permissions: [],
 			},
-			{
-				name: "Balance Transfer",
-				link: "/admin/bank/transfer",
-				permissions: ["transfer fund"],
-			},
-			{
-				name: "Balance Transfer History",
-				link: "/admin/bank/transfer/history",
-				permissions: [],
-			},
+			// {
+			// 	name: "Balance Transfer",
+			// 	link: "/admin/bank/transfer",
+			// 	permissions: ["transfer fund"],
+			// },
+			// {
+			// 	name: "Balance Transfer History",
+			// 	link: "/admin/bank/transfer/history",
+			// 	permissions: [],
+			// },
 		],
 	},
 	{

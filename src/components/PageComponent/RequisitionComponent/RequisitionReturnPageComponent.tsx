@@ -6,7 +6,7 @@ import CustomModal from "../../Modal/Modal";
 import AddRequisitionForm from "../../Forms/RequisitionForms/AddRequisitionForm";
 import { ErrorMessage } from "../../../utils/ErrorMessage";
 
-const RequisitionsPageComponent: React.FC = () => {
+const RequisitionsReturnPageComponent: React.FC = () => {
 	const [data, setData] = useState<any>([]);
 	const [modalIsOpen, setIsOpen] = React.useState(false);
 	const showModal = (show: boolean) => {
@@ -14,7 +14,7 @@ const RequisitionsPageComponent: React.FC = () => {
 	};
 	const [currentData, setCurrentData] = useState<any>(null);
 
-	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/requisitions`);
+	const [link, setLink] = useState(`${BACKENDAPI}/v1.0/requisitions/return`);
 	const [nextPageLink, setNextPageLink] = useState("");
 	const [prevPageLink, setPrevPageLink] = useState("");
 
@@ -44,7 +44,7 @@ const RequisitionsPageComponent: React.FC = () => {
 				});
 		}
 	};
-
+	// pagination required
 	const loadData = (link: string) => {
 		apiClient()
 			.get(link)
@@ -58,23 +58,23 @@ const RequisitionsPageComponent: React.FC = () => {
 				console.log(error.response, "ggg");
 			});
 	};
-	const approveData = (id: number) => {
-		if (window.confirm("Are you sure  want to approve ?")) {
-			apiClient()
-				.put(`${BACKENDAPI}/v1.0/requisitions/approve`, {
-					id: id,
-				})
-				.then((response: any) => {
-					console.log(response);
-					removeData(id);
-					toast("Data Approved");
-				})
-				.catch((error) => {
-					console.log(error.response);
-					ErrorMessage(error.response.status, error.response.data.message);
-				});
-		}
-	};
+	// const approveData = (id: number) => {
+	// 	if (window.confirm("Are you sure  want to approve ?")) {
+	// 		apiClient()
+	// 			.put(`${BACKENDAPI}/v1.0/requisitions/approve`, {
+	// 				id: id,
+	// 			})
+	// 			.then((response: any) => {
+	// 				console.log(response);
+	// 				removeData(id);
+	// 				toast("Data Approved");
+	// 			})
+	// 			.catch((error) => {
+	// 				console.log(error.response);
+	// 				ErrorMessage(error.response.status, error.response.data.message);
+	// 			});
+	// 	}
+	// };
 	const moveToParchase = (id: string | number) => {
 		apiClient()
 			.put(`${BACKENDAPI}/v1.0/requisitionToParchase`, {
@@ -150,7 +150,7 @@ const RequisitionsPageComponent: React.FC = () => {
 														edit
 													</a>
 												</li>
-												<li>
+												{/* <li>
 													<hr className="dropdown-divider" />
 												</li>
 												<li>
@@ -160,10 +160,10 @@ const RequisitionsPageComponent: React.FC = () => {
 														}}
 														className="dropdown-item"
 														href="#">
-														Requisition Return
+														Approve
 													</a>
-												</li>
-												<li>
+												</li> */}
+												{/* <li>
 													<hr className="dropdown-divider" />
 												</li>
 												<li>
@@ -178,7 +178,7 @@ const RequisitionsPageComponent: React.FC = () => {
 												</li>
 												<li>
 													<hr className="dropdown-divider" />
-												</li>
+												</li> */}
 											</ul>
 										</div>
 									</td>
@@ -231,4 +231,4 @@ const RequisitionsPageComponent: React.FC = () => {
 	);
 };
 
-export default RequisitionsPageComponent;
+export default RequisitionsReturnPageComponent;

@@ -77,17 +77,17 @@ const AddProductForm: React.FC<UpdateFormInterface> = (props) => {
 		e.preventDefault();
 		setErrors(null);
 		if (props.type === "update") {
-			updateProduct();
+			updateData();
 		} else {
-			createProduct();
+			createData();
 		}
 	};
-	const createProduct = () => {
+	const createData = () => {
 		apiClient()
 			.post(`${BACKENDAPI}/v1.0/products`, { ...formData })
 			.then((response) => {
 				console.log(response);
-				toast.success("product saved");
+				toast.success("Data saved");
 				resetFunction();
 			})
 			.catch((error) => {
@@ -111,12 +111,12 @@ const AddProductForm: React.FC<UpdateFormInterface> = (props) => {
 			setFormData(props.value);
 		}
 	}, []);
-	const updateProduct = () => {
+	const updateData = () => {
 		apiClient()
 			.put(`${BACKENDAPI}/v1.0/products`, { ...formData })
 			.then((response: any) => {
 				console.log(response);
-				toast.success("Product Updated");
+				toast.success("Data Updated");
 
 				props.updateDataStates(response.data.product);
 				props.showModal(false);

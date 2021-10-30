@@ -2,30 +2,32 @@ import React, { useState, useEffect } from "react";
 import { BACKENDAPI } from "../../../config";
 import { apiClient } from "../../../utils/apiClient";
 import { toast } from "react-toastify";
+import { ErrorMessage } from "../../../utils/ErrorMessage";
+import { UpdateFormInterface } from "../../../interfaces/UpdateFormInterfaced";
 
 interface FormData {
 	supplier: string;
 	reference_no: string;
-	purchase_date: string;
+	// purchase_date: string;
 	purchase_status: string;
 	product_id: string;
 	// amount: string;
-	payment_method: string;
+	// payment_method: string;
 	quantity: number;
-	account_number: string;
+	// account_number: string;
 	wing_id: string;
 }
-const AddRequisitionForm: React.FC = () => {
+const AddRequisitionForm: React.FC<UpdateFormInterface> = (props) => {
 	const [formData, setFormData] = useState<FormData>({
 		supplier: "",
 		reference_no: "",
-		purchase_date: "",
+		// purchase_date: "",
 		purchase_status: "",
 		product_id: "",
 		// amount: "",
-		payment_method: "",
+		// payment_method: "",
 		quantity: 1,
-		account_number: "",
+		// account_number: "",
 		wing_id: "",
 	});
 	const [search, setSearch] = useState("");
@@ -60,29 +62,29 @@ const AddRequisitionForm: React.FC = () => {
 			status: "ordered",
 		},
 	];
-	const paymentMethods = [
-		{
-			method: "cash",
-		},
-		{
-			method: "card",
-		},
-		{
-			method: "cheque",
-		},
-		{
-			method: "bank transfer",
-		},
-		{
-			method: "other",
-		},
-		{
-			method: "from advance",
-		},
-		{
-			method: "recieved",
-		},
-	];
+	// const paymentMethods = [
+	// 	{
+	// 		method: "cash",
+	// 	},
+	// 	{
+	// 		method: "card",
+	// 	},
+	// 	{
+	// 		method: "cheque",
+	// 	},
+	// 	{
+	// 		method: "bank transfer",
+	// 	},
+	// 	{
+	// 		method: "other",
+	// 	},
+	// 	{
+	// 		method: "from advance",
+	// 	},
+	// 	{
+	// 		method: "recieved",
+	// 	},
+	// ];
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -104,43 +106,19 @@ const AddRequisitionForm: React.FC = () => {
 		setFormData({
 			supplier: "",
 			reference_no: "",
-			purchase_date: "",
+			// purchase_date: "",
 			purchase_status: "",
 			product_id: "",
 			// amount: "",
-			payment_method: "",
+			// payment_method: "",
 			quantity: 1,
-			account_number: "",
+			// account_number: "",
 			wing_id: "",
 		});
 		setproduct(null);
 		setSearch("");
 	};
-	// handle submit Function
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		setErrors(null);
-		apiClient()
-			.post(`${BACKENDAPI}/v1.0/requisitions`, { ...formData })
-			.then((response) => {
-				console.log(response);
-				toast("requisition saved");
-				resetFunction();
-			})
-			.catch((error) => {
-				console.log(error.response);
-				if (
-					error.response.status === 404 ||
-					error.response.status === 400
-				) {
-					toast.error(error.response.data.message);
-				}
-				if (error.response.status === 422) {
-					toast.error("invalid input");
-					setErrors(error.response.data.errors);
-				}
-			});
-	};
+
 	// get search string Function
 	const searchFunc = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearch(e.target.value);
@@ -148,15 +126,15 @@ const AddRequisitionForm: React.FC = () => {
 	// search on enter
 	const searchOnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.code === "Enter") {
-			searchProduct();
+			searchProduct(search);
 		}
 	};
 	// search on focus change
 	const searchOnBlur = () => {
-		searchProduct();
+		searchProduct(search);
 	};
 	// product search logic
-	const searchProduct = () => {
+	const searchProduct = (search: string) => {
 		apiClient()
 			.get(`${BACKENDAPI}/v1.0/products/search/${search}`)
 			.then((response: any) => {
@@ -174,6 +152,82 @@ const AddRequisitionForm: React.FC = () => {
 				}
 			});
 	};
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		setErrors(null);
+		if (props.type === "update") {
+			updateData();
+		} else {
+			createData();
+		}
+	};
+	const createData = () => {
+		apiClient()
+			.post(`${BACKENDAPI}/v1.0/requisitions`, { ...formData })
+			.then((response) => {
+				console.log(response);
+				toast.success("data saved");
+				resetFunction();
+			})
+			.catch((error) => {
+				console.log(error.response);
+				ErrorMessage(error.response.status, error.response.data.message);
+				if (error.response.status === 422) {
+					toast.error("invalid input");
+					setErrors(error.response.data.errors);
+				}
+			});
+	};
+
+	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	// edit data section
+	const getProduct = (id: number) => {
+		apiClient()
+			.get(`${BACKENDAPI}/v1.0/products/${id}`)
+			.then((response: any) => {
+				console.log(response);
+				const { product } = response.data;
+				setproduct(product);
+			})
+			.catch((error) => {
+				console.log(error.response);
+				setproduct(null);
+				setFormData({ ...formData, product_id: "" });
+				if (error.response.status === 404) {
+					toast("np product found");
+				}
+			});
+	};
+	useEffect(() => {
+		if (props.type == "update") {
+			setFormData({ ...props.value, product_id: props.value.product.id });
+			setSearch(props.value.product.name);
+			getProduct(props.value.product.id);
+		}
+	}, []);
+	const updateData = () => {
+		apiClient()
+			.put(`${BACKENDAPI}/v1.0/requisitions`, { ...formData })
+			.then((response: any) => {
+				console.log(response);
+				toast.success("data Updated");
+
+				props.updateDataStates(response.data.requisition);
+				props.showModal(false);
+			})
+			.catch((error) => {
+				console.log(error);
+				console.log(error.response);
+				ErrorMessage(error.response.status, error.response.data.message);
+				if (error.response.status === 422) {
+					toast.error("invalid input");
+					setErrors(error.response.data.errors);
+				}
+			});
+	};
+	// end edit Data section
+	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 	return (
 		<form className="row g-3">
@@ -254,7 +308,7 @@ const AddRequisitionForm: React.FC = () => {
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
-			<div className="col-md-3">
+			{/* <div className="col-md-3">
 				<label htmlFor="purchase_date" className="form-label">
 					Purchase Date:*
 				</label>
@@ -276,7 +330,7 @@ const AddRequisitionForm: React.FC = () => {
 					<div className="invalid-feedback">{errors.purchase_date[0]}</div>
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
-			</div>
+			</div> */}
 			<div className="col-md-3">
 				<label htmlFor="purchase_status" className="form-label">
 					Purchase Status
@@ -394,7 +448,7 @@ const AddRequisitionForm: React.FC = () => {
 				{errors && <div className="valid-feedback">Looks good!</div>}
 			</div>
 
-			<div className="col-md-3">
+			{/* <div className="col-md-3">
 				<label htmlFor="payment_method" className="form-label">
 					Payment Method
 				</label>
@@ -426,8 +480,8 @@ const AddRequisitionForm: React.FC = () => {
 					</div>
 				)}
 				{errors && <div className="valid-feedback">Looks good!</div>}
-			</div>
-			{showAccountField && (
+			</div> */}
+			{/* {showAccountField && (
 				<div className="col-md-6">
 					<label htmlFor="account_number" className="form-label">
 						Bank Account Number
@@ -453,7 +507,7 @@ const AddRequisitionForm: React.FC = () => {
 					)}
 					{errors && <div className="valid-feedback">Looks good!</div>}
 				</div>
-			)}
+			)} */}
 
 			<div className="text-center">
 				<button

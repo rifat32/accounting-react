@@ -1,19 +1,16 @@
-import React, { useContext } from "react";
+import React from "react";
 import AdminPageComponent from "../../../components/PageComponent/AdminPageComponent";
-import AddRequisitionForm from "../../../components/Forms/RequisitionForms/AddRequisitionForm";
-import { AppContext } from "../../../context";
-import UnAuthorized from "../../ErrorPages/403";
 
-const AddRequisitionPage: React.FC = () => {
-	const { permissions } = useContext(AppContext);
-	if (!permissions.includes("create requisition")) {
-		return <UnAuthorized />;
-	}
+import { Link } from "react-router-dom";
+
+import RequisitionReportPageComponent from "../../../components/PageComponent/RequisitionComponent/RequisitionReportPageComponent";
+
+const RequisitionsReportPage: React.FC = () => {
 	return (
 		<AdminPageComponent>
 			<main id="main" className="main">
 				<div className="pagetitle">
-					<h1>Add Requisition</h1>
+					<h1>Requisition</h1>
 					<nav>
 						<ol className="breadcrumb">
 							<li className="breadcrumb-item">
@@ -21,7 +18,7 @@ const AddRequisitionPage: React.FC = () => {
 							</li>
 							<li className="breadcrumb-item">Requisition</li>
 							<li className="breadcrumb-item active">
-								Requisitions Create
+								Requisition Report
 							</li>
 						</ol>
 					</nav>
@@ -32,8 +29,13 @@ const AddRequisitionPage: React.FC = () => {
 						<div className="col-12">
 							<div className="card">
 								<div className="card-body">
-									<h5 className="card-title">Add Requisition</h5>
-									<AddRequisitionForm />
+									<div className="d-flex justify-content-between align-items-end">
+										<h5 className="card-title">
+											{" "}
+											Requisitions Report
+										</h5>
+									</div>
+									<RequisitionReportPageComponent />
 								</div>
 							</div>
 						</div>
@@ -44,4 +46,4 @@ const AddRequisitionPage: React.FC = () => {
 	);
 };
 
-export default AddRequisitionPage;
+export default RequisitionsReportPage;

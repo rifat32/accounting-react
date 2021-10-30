@@ -171,24 +171,25 @@ const AddUserForm: React.FC = () => {
 				<input
 					type="password"
 					name="password_confirmation"
-					className={
-						errors
-							? errors.password_confirmation
-								? `form-control is-invalid`
-								: `form-control is-valid`
-							: "form-control"
-					}
+					// className={
+					// 	errors
+					// 		? errors.password_confirmation
+					// 			? `form-control is-invalid`
+					// 			: `form-control is-valid`
+					// 		: "form-control"
+					// }
+					className="form-control"
 					id="password_confirmation"
 					required
 					onChange={handleChange}
 					value={formData.password_confirmation}
 				/>
-				{errors?.password_confirmation && (
+				{/* {errors?.password_confirmation && (
 					<div className="invalid-feedback">
 						{errors.password_confirmation[0]}
 					</div>
 				)}
-				{errors && <div className="valid-feedback">Looks good!</div>}
+				{errors && <div className="valid-feedback">Looks good!</div>} */}
 			</div>
 			<div className="col-md-12">
 				<label htmlFor="role_name" className="form-label">

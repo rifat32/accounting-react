@@ -36,6 +36,12 @@ import CreateCharOfAccountPage from "./pages/AdminPages/DoubleEntry/AddAccountPa
 import ChartOfAccountsPage from "./pages/AdminPages/DoubleEntry/ChartOfAccountsPage";
 import ListTransfersPageComponent from "./components/PageComponent/BalanceComponent/ListTransfersPageComponent";
 import ListTransfersPage from "./pages/AdminPages/Balance/BankTransferHistory";
+import RequisitionsReturnPage from "./pages/AdminPages/Requisition/RequisitionsReturnPage";
+import RequisitionsReportPage from "./pages/AdminPages/Requisition/RequisitionsReportPage";
+import ListParchaseReturnPage from "./pages/AdminPages/Parchase/PurchaseReturnpage";
+import PurchaseReportPage from "./pages/AdminPages/Parchase/PurchaseReportPage";
+import IncomeReportPage from "./pages/AdminPages/Income/IncomeReportPage";
+import ExpenseReportPage from "./pages/AdminPages/Expense/ExpenseReportPage";
 
 export const RouteData: RouteInterface[] = [
 	{
@@ -135,6 +141,16 @@ export const RouteData: RouteInterface[] = [
 		exact: true,
 		component: RequisitionsPage,
 	},
+	{
+		path: "/admin/requisitions/return",
+		exact: false,
+		component: RequisitionsReturnPage,
+	},
+	{
+		path: "/admin/requisitions/report",
+		exact: false,
+		component: RequisitionsReportPage,
+	},
 	// Parchases
 	{
 		path: "/admin/parchases/create",
@@ -146,6 +162,17 @@ export const RouteData: RouteInterface[] = [
 		exact: true,
 		component: ListParchasePage,
 	},
+	{
+		path: "/admin/parchases/return",
+		exact: false,
+		component: ListParchaseReturnPage,
+	},
+	{
+		path: "/admin/parchases/report",
+		exact: false,
+		component: PurchaseReportPage,
+	},
+
 	// Incomes
 	{
 		path: "/admin/revenues/create",
@@ -166,6 +193,11 @@ export const RouteData: RouteInterface[] = [
 		path: "/admin/credits",
 		exact: true,
 		component: ListCreditNotesPage,
+	},
+	{
+		path: "/admin/income/report",
+		exact: false,
+		component: IncomeReportPage,
 	},
 	// expense
 	{
@@ -197,6 +229,11 @@ export const RouteData: RouteInterface[] = [
 		path: "/admin/debitNotes",
 		exact: true,
 		component: ListDebitNotesPage,
+	},
+	{
+		path: "/admin/expense/report",
+		exact: false,
+		component: ExpenseReportPage,
 	},
 	// Balance
 	{
